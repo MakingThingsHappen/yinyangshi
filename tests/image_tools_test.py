@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import cv2
-import numpy as np
 from unittest import TestCase
 from image_tools import ImageLocation
 
@@ -16,6 +15,9 @@ YYS_T = os.path.join(rc_dir, "yys.png")
 
 WAIT2 = os.path.join(base_dir, "wait2.jpg")
 WAIT2_T = os.path.join(rc_dir, "wait2.png")
+
+WAIT5 = os.path.join(base_dir, "wait5.jpg")
+WAIT5_T = os.path.join(rc_dir, "wait5.png")
 
 JOIN2 = os.path.join(base_dir, "join2.jpg")
 JOIN2_T = os.path.join(rc_dir, "join2.png")
@@ -46,6 +48,15 @@ class ImageToolTest(TestCase):
         src_img_rgb = cv2.imread(WAIT2)
         tgt_img_rgb = cv2.imread(WAIT2_T, 0)
         pt = il._get_location_obj(src_img_rgb, tgt_img_rgb, 0.5)
+        w, h = tgt_img_rgb.shape[::-1]
+        draw = il.draw_rect(pt, w, h, src_img_rgb, OUT)
+        self.assertEqual(draw, True)
+
+    def test_draw_rect_wait5(self):
+        il = ImageLocation()
+        src_img_rgb = cv2.imread(WAIT5)
+        tgt_img_rgb = cv2.imread(WAIT5_T, 0)
+        pt = il.get_location(WAIT5, WAIT5_T, 0.5)
         w, h = tgt_img_rgb.shape[::-1]
         draw = il.draw_rect(pt, w, h, src_img_rgb, OUT)
         self.assertEqual(draw, True)

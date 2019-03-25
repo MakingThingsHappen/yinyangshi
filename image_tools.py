@@ -6,10 +6,6 @@ import numpy as np
 
 
 class ImageLocation(object):
-    def __init__(self):
-        self.src_img_rgb = None  # 原图像对象
-        self.tgt_img_rgb = None  # 目标图像对象
-        self.pt = None  # 匹配到的对象
 
     @staticmethod
     def _help(x):
@@ -19,7 +15,8 @@ class ImageLocation(object):
             return 255
         return x
 
-    def get_color_mean(self, img, color=(), mask=0):
+    @classmethod
+    def get_color_mean(cls, img, color=(), mask=0):
         """得到颜色占比
 
         Args:
@@ -33,8 +30,8 @@ class ImageLocation(object):
         if isinstance(img, (str, unicode)):
             img = cv2.imread(img)
 
-        lower, upper = ([self._help(color[2] - mask), self._help(color[1] - mask), self._help(color[0] - mask)],
-                        [self._help(color[2] + mask), self._help(color[1] + mask), self._help(color[0] + mask)])
+        lower, upper = ([cls._help(color[2] - mask), cls._help(color[1] - mask), cls._help(color[0] - mask)],
+                        [cls._help(color[2] + mask), cls._help(color[1] + mask), cls._help(color[0] + mask)])
         lower = np.array(lower, dtype=np.uint8)
         upper = np.array(upper, dtype=np.uint8)
         mask = cv2.inRange(img, lower, upper)
@@ -58,16 +55,19 @@ class ImageLocation(object):
             return pt
         return None
 
-    def get_location_obj(self, source, target, threshold=0.8):
+    @classmethod
+    def get_location_obj(cls, source, target, threshold=0.8):
         """从source中获取target的坐标
 
         :param source:
         :param target:
         :return:
         """
-        self.src_img_rgb = cv2.imread(source)
-        self.tgt_img_rgb = cv2.imread(target, 0)
-        return self._get_location_obj(self.src_img_rgb, self.tgt_img_rgb, threshold=threshold)
+        if isinstance(source, (str, unicode)):
+            source = cv2.imread(source)
+        if isinstance(target, (str, unicode)):
+            target = cv2.imread(target, 0)
+        return cls._get_location_obj(source, target, threshold=threshold)
 
     @classmethod
     def get_match_image_loc(cls, src, target, ratio=0.55):
@@ -102,11 +102,15 @@ class ImageLocation(object):
         x, y = kp2[img2_idx].pt
         return int(x), int(y)
 
-    def get_target_shape(self):
-        w, h = self.tgt_img_rgb.shape[::-1]
+    @staticmethod
+    def get_target_shape(target_img):
+        if isinstance(target_img, (str, unicode)):
+            target_img = cv2.imread(target_img, 0)
+        w, h = target_img.shape[::-1]
         return int(w), int(h)
 
-    def get_location(self, source, target, threshold=0.8):
+    @classmethod
+    def get_location(cls, source, target, threshold=0.8):
         """从source中获取target的中心坐标
 
         Args:
@@ -118,12 +122,11 @@ class ImageLocation(object):
 
         """
         try:
-            pt = self.get_location_obj(source, target, threshold)
+            pt = cls.get_location_obj(source, target, threshold)
             if pt:
                 return int(pt[0]), int(pt[1])
-            _, pt = self.get_match_image_loc(source, target)
+            _, pt = cls.get_match_image_loc(source, target)
             return int(pt[0]), int(pt[1])
-
         except Exception:
             raise errors.LocationDoesNotFound
 
