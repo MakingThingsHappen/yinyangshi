@@ -5,6 +5,7 @@ import win32api
 import win32gui
 import win32process
 import win32ui
+import time
 from _ctypes import Structure
 
 import win32con
@@ -23,8 +24,19 @@ class MouseTools(object):
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN | win32con.MOUSEEVENTF_LEFTUP, 0, 0)
 
     @staticmethod
+    def clickDragDrop(x_step, y_step):
+        """鼠标拖拽,
+        x_step 横轴
+        y_step 纵轴
+        """
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+        time.sleep(0.30)
+        win32api.mouse_event(win32con.MOUSEEVENTF_MOVE|win32con.MOUSEEVENTF_LEFTUP, x_step, y_step, 0, 0)
+
+    @staticmethod
     def setCursorPos(*args, **kwargs):  # 移动鼠标
         win32api.SetCursorPos(*args, **kwargs)
+        # ctypes.windll.user32.SetCursorPos(*pos)
 
     @staticmethod
     def getCurPos():  # 获得鼠标位置信息，这个再实际代码没用上，调试用得上
@@ -48,7 +60,7 @@ class WindowsTools(object):
 
     @staticmethod
     def get_hwnd_from_title(hwnds, title):
-        return filter(lambda i: title in win32gui.GetWindowText(i).decode("gb2312"), hwnds)
+        return filter(lambda i: title in win32gui.GetWindowText(i), hwnds)
 
     @staticmethod
     def window_capture(hwnd, filename="capture.jpg", base_dir="rs"):

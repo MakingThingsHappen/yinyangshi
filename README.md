@@ -8,3 +8,7 @@
 ## Quick Start
 
  python mumu.py
+ 
+ 
+### TODO
+不同的动作应该再不同的状态下才行

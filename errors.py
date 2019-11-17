@@ -8,3 +8,6 @@ class MuMuDoesNotFound(Exception):
 
 class LogicNotHaveProcessor(Exception):
     pass
+
+class UnMatched(Exception):
+    pass

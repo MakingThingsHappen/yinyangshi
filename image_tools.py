@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import logging
 import cv2
 import errors
 import numpy as np
@@ -27,7 +27,7 @@ class ImageLocation(object):
         Returns(float):
 
         """
-        if isinstance(img, (str, unicode)):
+        if isinstance(img, (str, )):
             img = cv2.imread(img)
 
         lower, upper = ([cls._help(color[2] - mask), cls._help(color[1] - mask), cls._help(color[0] - mask)],
@@ -63,17 +63,17 @@ class ImageLocation(object):
         :param target:
         :return:
         """
-        if isinstance(source, (str, unicode)):
+        if isinstance(source, (str, )):
             source = cv2.imread(source)
-        if isinstance(target, (str, unicode)):
+        if isinstance(target, (str, )):
             target = cv2.imread(target, 0)
         return cls._get_location_obj(source, target, threshold=threshold)
 
     @classmethod
     def get_match_image_loc(cls, src, target, ratio=0.55):
-        if isinstance(src, (str, unicode)):
+        if isinstance(src, (str, )):
             src = cv2.imread(src, 0)
-        if isinstance(target, (str, unicode)):
+        if isinstance(target, (str, )):
             target = cv2.imread(target, 0)
 
         # Initiate SIFT detector
@@ -104,7 +104,7 @@ class ImageLocation(object):
 
     @staticmethod
     def get_target_shape(target_img):
-        if isinstance(target_img, (str, unicode)):
+        if isinstance(target_img, (str, )):
             target_img = cv2.imread(target_img, 0)
         w, h = target_img.shape[::-1]
         return int(w), int(h)
@@ -129,6 +129,16 @@ class ImageLocation(object):
             return int(pt[0]), int(pt[1])
         except Exception:
             raise errors.LocationDoesNotFound
+
+    @classmethod
+    def is_match_template(cls, source, target, threshold=0.8):
+        """判断源图片(source) 是否包含目标(target)图片.
+
+        不包含返回None, 否则返回坐标
+        """
+        logging.info("is_match_template: source %s %s", source, target)
+        match = cls.get_location_obj(source, target, threshold)
+        return match
 
 
 if __name__ == '__main__':
